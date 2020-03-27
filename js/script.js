@@ -1,43 +1,50 @@
-$("#myplayer-timeline").mediaPlayer({
-        autoplay : false,
-        src : "full/samples-data/examples/vid/amalia01.mp4",
-        plugins: {
-                dataServices: [
+$( function () {
+        $( "#defaultPlayer" ).mediaPlayer( {
+            autoplay : false,
+            src : "full/samples-data/examples/vid/amalia01.mp4",
+            //src : "blazers.mp4",
+            controlBar :
+                {
+                    sticky : true
+                },
+            plugins : {
+                dataServices : [
                     'full/samples-data/examples/json/amalia01-events.json',
                     'full/samples-data/examples/json/amalia01-kf.json',
                     'full/samples-data/examples/json/amalia01-ball.json'
                 ],
-                list: [
+                list : [
                     {
-                        'className': 'en.ina.amalia.player.plugins.TimelinePlugin',
-                        'container': '#myplayer-timeline-timeline',
-                        'parameters': {
-                            listOfLines: [
+                        'className' : 'fr.ina.amalia.player.plugins.TimelinePlugin',
+                        'container' : '#timeline',
+                        'parameters' : {
+                            listOfLines : [
                                 {
-                                    title: 'Events',
-                                    type: 'cuepoint',
-                                    metadataId: 'events-amalia01',
-                                    color: '#3CF',
-                                    pointNav: true
+                                    title : 'Events',
+                                    type : 'cuepoint',
+                                    metadataId : 'events-amalia01',
+                                    color : '#3CF',
+                                    pointNav : true
                                 },
                                 {
-                                    title: 'Ball moving up',
-                                    type: 'segment',
-                                    metadataId: 'ball-amalia01',
-                                    color: '#F00'
+                                    title : 'Ball moving up',
+                                    type : 'segment',
+                                    metadataId : 'ball-amalia01',
+                                    color : '#F00'
                                 },
                                 {
-                                    title: 'Keyframes every 2s',
-                                    type: 'image',
-                                    metadataId: 'kf-amalia01',
-                                    pointNav: true
-                                },
+                                    title : 'Keyframes every 2s',
+                                    type : 'image',
+                                    metadataId : 'kf-amalia01',
+                                    pointNav : true
+                                }
                             ]
                         }
                     }
                 ]
             }
-});
+        } );
+    } );
 
 
 var data = [4, 8, 15, 16, 23, 200];
