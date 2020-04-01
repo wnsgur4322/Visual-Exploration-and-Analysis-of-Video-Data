@@ -72,10 +72,16 @@ var barchart = svg.selectAll("rect")
                 return "translate(" + translate + ")";
         });
 
-var imgs = d3.json("js/video.json", function (d) {
-        var img = d3.select("body").append("img")
-                .attr("width", 500)
-                .attr("height", 500)
-        img.selectAll
-} )
+// tensorflow.js with coco-ssd
+const img2 = document.getElementById('img2');
+
+
+// Load the model.
+cocoSsd.load().then(model => {
+    // detect objects in the image.
+model.detect(img2).then(predictions => {
+    console.log('Predictions: ', predictions);
+    });
+});
+
 
