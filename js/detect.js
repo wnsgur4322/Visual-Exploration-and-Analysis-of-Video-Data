@@ -6,17 +6,22 @@ cocoSsd.load().then(function(res){
   console.log('done')
   $("#defaultPlayer").attr('title','Ready')
   $("#upload_btn_div").attr('title','Ready')
+  $("#web-cam-btn").attr('title','Ready')
   
   setTimeout(function(){
     $("#defaultPlayer").attr('title','')
     $("#upload_btn_div").attr('title','')
+    $("#web-cam-btn").attr('title','')
   }, 1000)
   $("#defaultPlayer>a").removeClass('disabled')
   $("#upload_btn_div>a").removeClass('disabled')
+  $("#web-cam-btn>a").removeClass('disabled')
 },function(){
   //tf load error
   console.log('loading tensorflow model is failed')
   $("#defaultPlayer").attr('title', 'Failed to load tensorflow model on webapp')
+  $("#upload_btn_div").attr('title','Failed to load tf model in browser')
+  $("#web-cam-btn").attr('title','Failed to load tf model in browser')
 });
 
 function draw_sample_image_in_canvas(){
@@ -150,7 +155,7 @@ var video
 var localstream
 
 function close_stream(){
-  video = document.getElementById("video")
+  video = document.getElementById("#defaultPlayer")
   video.pause()
   video.src = ""
   tracks = localstream.getTracks()
