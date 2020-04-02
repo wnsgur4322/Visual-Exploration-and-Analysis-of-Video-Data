@@ -1,8 +1,8 @@
 $( function () {
         $( "#defaultPlayer" ).mediaPlayer( {
             autoplay : false,
-            src : "full/samples-data/examples/vid/amalia01.mp4",
-            //src : "blazers.mp4",
+            //src : "full/samples-data/examples/vid/amalia01.mp4",
+            src : "blazers.mp4",
             controlBar :
                 {
                     sticky : true
@@ -71,17 +71,4 @@ var barchart = svg.selectAll("rect")
                 var translate = [barwidth * i, 0];
                 return "translate(" + translate + ")";
         });
-
-// tensorflow.js with coco-ssd
-const img2 = document.getElementById('img2');
-
-
-// Load the model.
-cocoSsd.load().then(model => {
-    // detect objects in the image.
-model.detect(img2).then(predictions => {
-    console.log('Predictions: ', predictions);
-    });
-});
-
 

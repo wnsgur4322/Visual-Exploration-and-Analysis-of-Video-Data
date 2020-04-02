@@ -2,6 +2,18 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <!-- tensorflow script -->
+        <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+        <!-- Load the coco-ssd model. -->
+        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
+
+        <!-- Load React. -->
+        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+
+        <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#03a6f3">
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -29,11 +41,6 @@
         <!-- /script-player -->
         <script type="text/javascript" src="full/build/js/i18n/amalia.js-message-en.js"></script>
 
-        <!-- tensorflow script -->
-        <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
-        <!-- Load the coco-ssd model. -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
     </head>
 
     <body>
@@ -48,6 +55,7 @@
         </header>
         
         <div class="container">
+            <script src="js/detect.js" type="text/babel"></script>
             <div class="content">           
                     <div style="height: 350px;">
                         <div id="defaultPlayer"></div>
@@ -69,7 +77,24 @@
                         </svg>
                 </p>
                 <p>this doesn't have meaning, dummy text.</p>
-                <img id ="img2" src="https://assets.rebelmouse.io/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbWFnZSI6Imh0dHBzOi8vYXNzZXRzLnJibC5tcy8yMjIxMjY4NC9vcmlnaW4uanBnIiwiZXhwaXJlc19hdCI6MTU4ODM5OTE3NX0.-GSr86BWpH8t4KtcTTkZFAQOgnFLEX-7-DBcyQorOIs/img.jpg?width=980"/>
+                <!-- Replace this with your image. Make sure CORS settings allow reading the image! -->
+<img id="img" src="image/capture1.JPG"/>
+
+<!-- Place your code in the script tag below. You can also use an external .js file -->
+<script>
+  // Notice there is no 'import' statement. 'cocoSsd' and 'tf' is
+  // available on the index-page because of the script tag above.
+
+  const img = document.getElementById('img');
+
+  // Load the model.
+  cocoSsd.load().then(model => {
+    // detect objects in the image.
+    model.detect(img).then(predictions => {
+      console.log('Predictions: ', predictions);
+    });
+  });
+</script>
             </div>
 
             <footer>
