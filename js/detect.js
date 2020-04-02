@@ -1,126 +1,199 @@
-// tensorflow.js with coco-ssd
-const img2 = document.getElementById('#img2');
+var model
 
-
-// Load the model.
-cocoSsd.load().then(model => {
-    // detect objects in the image.
-model.detect(img2).then(predictions => {
-    console.log('Predictions: ', predictions);
-    });
+console.log('loading coco-ssd model ...')
+cocoSsd.load().then(function(res){
+  model = res
+  console.log('done')
+  $("#defaultPlayer").attr('title','Ready')
+  $("#upload_btn_div").attr('title','Ready')
+  
+  setTimeout(function(){
+    $("#defaultPlayer").attr('title','')
+    $("#upload_btn_div").attr('title','')
+  }, 1000)
+  $("#defaultPlayer>a").removeClass('disabled')
+  $("#upload_btn_div>a").removeClass('disabled')
+},function(){
+  //tf load error
+  console.log('loading tensorflow model is failed')
+  $("#defaultPlayer").attr('title', 'Failed to load tensorflow model on webapp')
 });
 
-class App extends React.Component {
-        // reference to both the video and canvas
-        videoRef = React.createRef();
-        canvasRef = React.createRef();
-      
-        // we are gonna use inline style
-        styles = {
-          position: 'fixed',
-          top: 150,
-          left: 150,
-        };
-        
-      }
+function draw_sample_image_in_canvas(){
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  var imageObj = new Image();
+  canvas.width = 888;
+  canvas.height = 500;
 
-detectFromVideoFrame = (model, video) => {
-        model.detect(video).then(predictions => {
-          this.showDetections(predictions);
-    
-          requestAnimationFrame(() => {
-            this.detectFromVideoFrame(model, video);
-          });
-        }, (error) => {
-          console.log("Couldn't start")
-          console.error(error)
-        });
-      };
+  imageObj.onload = function() {
+      ctx.drawImage(imageObj, 0, 0, 888, 500);
+  };
+  imageObj.src = 'image/capture1.JPG';
+}
+draw_sample_image_in_canvas()
 
-showDetections = predictions => {
-    const ctx = this.canvasRef.current.getContext("2d");
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    const font = "24px helvetica";
-    ctx.font = font;
-    ctx.textBaseline = "top";
+function invoke_upload_image(){
+  $("#upload-btn").click();
+}
 
-    predictions.forEach(prediction => {
+function draw_bbox(ctx, predictions, font){
+  predictions.forEach(prediction => {
       const x = prediction.bbox[0];
       const y = prediction.bbox[1];
       const width = prediction.bbox[2];
       const height = prediction.bbox[3];
-      // Draw the bounding box.
-      ctx.strokeStyle = "#2fff00";
-      ctx.lineWidth = 1;
       ctx.strokeRect(x, y, width, height);
-      // Draw the label background.
-      ctx.fillStyle = "#2fff00";
       const textWidth = ctx.measureText(prediction.class).width;
-      const textHeight = parseInt(font, 10);
-      // draw top left rectangle
-      ctx.fillRect(x, y, textWidth + 10, textHeight + 10);
-      // draw bottom left rectangle
-      ctx.fillRect(x, y + height - textHeight, textWidth + 15, textHeight + 10);
+      const textHeight = parseInt(font, 10); // base 10
+      ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
+  });
+}
 
-      // Draw the text last to ensure it's on top.
+function draw_label(ctx, predictions){
+  predictions.forEach(prediction => {
+      const x = prediction.bbox[0];
+      const y = prediction.bbox[1];
+
       ctx.fillStyle = "#000000";
       ctx.fillText(prediction.class, x, y);
-      ctx.fillText(prediction.score.toFixed(2), x, y + height - textHeight);
     });
-  };
+}
 
-componentDidMount() {
-        if (navigator.mediaDevices.getUserMedia) {
-          // define a Promise that'll be used to load the webcam and read its frames
-          const webcamPromise = navigator.mediaDevices
-            .getUserMedia({
-              video: true,
-              audio: false,
-            })
-            .then(stream => {
-              // pass the current frame to the window.stream
-              window.stream = stream;
-              // pass the stream to the videoRef
-              this.videoRef.current.srcObject = stream;
-    
-              return new Promise(resolve => {
-                this.videoRef.current.onloadedmetadata = () => {
-                  resolve();
-                };
-              });
-            }, (error) => {
-              console.log("Couldn't start the webcam")
-              console.error(error)
-            });
-    
-          // define a Promise that'll be used to load the model
-          const loadlModelPromise = cocoSsd.load();
-          
-          // resolve all the Promises
-          Promise.all([loadlModelPromise, webcamPromise])
-            .then(values => {
-              this.detectFromVideoFrame(values[0], this.videoRef.current);
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        }
-      };
-render() {
-        return (
-          <div> 
-            <video
-              style={this.styles}
-              autoPlay
-              muted
-              ref={this.videoRef}
-              width="720"
-              height="600"
-            />
-            <canvas style={this.styles} ref={this.canvasRef} width="720" height="650" />
-          </div>
-        );
-      };
+function upload_image(){
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-const domContainer = document.querySelector('#root');
-ReactDOM.render(React.createElement(App), domContainer);
+  var input_elem = document.querySelector('input[type=file]')
+  var file = input_elem.files[0]; //sames as here
+  const image = document.getElementById('img');
+  
+  var reader  = new FileReader();
+  reader.addEventListener("load", function () {
+      image.src = reader.result;
+      
+      setTimeout(function(){
+          if(image.height>500){
+              image.width = image.width*(500/image.height)
+              image.height = 500
+          }
+
+          model.detect(image).then(function(predictions){
+              draw_res_image(canvas, ctx, image, predictions)
+          })
+      },1000)
+  }, false);
+
+  if (file) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      $('#spinner').show()
+      reader.readAsDataURL(file);
+  }
+}
+
+function draw_res_image(canvas, ctx, image, predictions){
+  const font = "16px sans-serif";
+  
+  canvas.width = image.width;
+  canvas.height = image.height;
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.drawImage(image, 0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  ctx.font = font;
+  ctx.textBaseline = "top";
+  ctx.strokeStyle = "#00FFFF";
+  ctx.lineWidth = 3;
+  ctx.fillStyle = "#00FFFF";
+
+  $('#spinner').hide()
+  draw_bbox(ctx, predictions, font)
+  draw_label(ctx, predictions)
+}
+
+function drawVideoPredictions(predictions){
+  const c = document.getElementById("canvas");
+  const ctx = c.getContext("2d");
+  c.width = 700;
+  c.height = 500;
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.drawImage(video, 0, 0, ctx.canvas.width, ctx.canvas.height);
+  // Font options.
+  const font = "16px sans-serif";
+  ctx.font = font;
+  ctx.textBaseline = "top";
+  predictions.forEach(prediction => {
+    const x = prediction.bbox[0];
+    const y = prediction.bbox[1];
+    const width = prediction.bbox[2];
+    const height = prediction.bbox[3];
+    // Draw the bounding box.
+    ctx.strokeStyle = "#00FFFF";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, width, height);
+    // Draw the label background.
+    ctx.fillStyle = "#00FFFF";
+    const textWidth = ctx.measureText(prediction.class).width;
+    const textHeight = parseInt(font, 10); // base 10
+    ctx.fillRect(x, y, textWidth + 4, textHeight + 4);
+  });
+
+  predictions.forEach(prediction => {
+    const x = prediction.bbox[0];
+    const y = prediction.bbox[1];
+    // Draw the text last to ensure it's on top.
+    ctx.fillStyle = "#000000";
+    ctx.fillText(prediction.class, x, y);
+  });
+}
+
+var video
+var localstream
+
+function close_stream(){
+  video = document.getElementById("video")
+  video.pause()
+  video.src = ""
+  tracks = localstream.getTracks()
+  tracks[0].stop();
+
+  setTimeout(function(){
+      draw_sample_image_in_canvas()
+      $('#close-web-cam').addClass('display-none')
+      $('#web-cam-btn').removeClass('display-none')
+  },1000)
+}
+
+function detectFrame() {
+  model.detect(video).then(predictions => {
+      drawVideoPredictions(predictions)
+      if(video.srcObject.active){
+          requestAnimationFrame(detectFrame)
+      }
+  })
+}
+
+function load_webcam(){
+  video = document.getElementById("#defaultPlayer")
+  
+  navigator.mediaDevices
+    .getUserMedia({
+      audio: false,
+      video: {
+        facingMode: "user",
+        width: 700,
+        height: 500
+      }
+    })
+    .then(stream => {
+      video.srcObject = stream
+      localstream = stream
+      video.onloadedmetadata = () => {
+        video.play()
+        $('#web-cam-btn').addClass('display-none')
+        $('#close-web-cam').removeClass('display-none')
+        detectFrame()
+      }
+    }, function(){
+      $.toaster({ settings: {timeout:5000}, title:'', message : 'Error: Could not retrive webcam feed', priority : 'danger' });   
+    })
+}

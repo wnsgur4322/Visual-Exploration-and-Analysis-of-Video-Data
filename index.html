@@ -2,18 +2,6 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <!-- tensorflow script -->
-        <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
-        <!-- Load the coco-ssd model. -->
-        <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
-
-        <!-- Load React. -->
-        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-        <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
-
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#03a6f3">
         <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -54,8 +42,7 @@
         </div>
         </header>
         
-        <div class="container">
-            <script src="js/detect.js" type="text/babel"></script>
+        <div class="container" style="margin-bottom: 20px;">
             <div class="content">           
                     <div style="height: 350px;">
                         <div id="defaultPlayer"></div>
@@ -65,36 +52,24 @@
             </div>
 
         <div class="container">
-                <p2>
-                    <svg class="bar-chart"></svg>
-                    <script src="d3/d3.js"></script>
-                    <script src ="js/script.js" charset="utf-8"></script>  
-                </p2>   
-                <p>
-                        <svg width="50" height="50">
-                            <circle cx="25" cy="25" r="22"
-                             fill="blue" stroke="gray" stroke-width="2"/>
-                        </svg>
-                </p>
-                <p>this doesn't have meaning, dummy text.</p>
-                <!-- Replace this with your image. Make sure CORS settings allow reading the image! -->
-<img id="img" src="image/capture1.JPG"/>
-
-<!-- Place your code in the script tag below. You can also use an external .js file -->
-<script>
-  // Notice there is no 'import' statement. 'cocoSsd' and 'tf' is
-  // available on the index-page because of the script tag above.
-
-  const img = document.getElementById('img');
-
-  // Load the model.
-  cocoSsd.load().then(model => {
-    // detect objects in the image.
-    model.detect(img).then(predictions => {
-      console.log('Predictions: ', predictions);
-    });
-  });
-</script>
+            <div id="close-web-cam" class="display-none clearfix float-right" style="margin-left: 10px;">
+                <a onclick="close_stream()" class="btn btn-primary float-left" href="#">Close</a>
+              </div>
+              <div id="web-cam-btn" class="clearfix float-right" style="margin-left: 10px;" title="Please wait 5-10 secs as the tf model downloads intially">
+                  <a onclick="load_webcam()" class="btn btn-primary float-left disabled" href="#">Try Real Time (on webcam feed)</a>
+                </div>
+            <div id="upload_btn_div" class="clearfix float-right" title="Please wait 5-10 secs as the tf model downloads intially">
+                <a onclick="invoke_upload_image()" class="btn btn-primary float-left disabled" href="#">Upload Image &rarr;</a>
+              </div>
+            <input style="display:none;" id="upload-btn" type="file" onchange="upload_image()"><br>
+        <div class="clear"></div>
+        <div class="result-div" id="result">
+          <div id="spinner" class="spinner"><img style='width:50px;' src='image/spinner.gif'/></div>
+          <img style="width:100%; display: none" id="img" src="" alt="Image Preview ..."/>
+          <canvas id="canvas"></canvas>   
+        </div>
+        <video id="video" style="display:none" width="700" height="500"></video>       
+    <div class="clear"></div>
             </div>
 
             <footer>
@@ -130,5 +105,11 @@
                 </div>
             </footer>
 
+    <!-- tensorflow script -->
+    <!-- Load TensorFlow.js. This is required to use coco-ssd model. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"> </script>
+    <!-- Load the coco-ssd model. -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"> </script>
+    <script src="js/detect.js"></script>
     </body>
 </html>
